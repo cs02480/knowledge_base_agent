@@ -1,0 +1,7 @@
+
+#pip install PyMuPDF langchain qdrant-client[fastembed] pydantic
+
+PyMuPDF
+langchain
+qdrant-client[fastembed]
+pydantic

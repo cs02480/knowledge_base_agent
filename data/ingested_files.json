@@ -1,0 +1,72 @@
+{
+    "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/Moving-Averages-A-Comprehensive-Guide.pdf": {
+        "file_path": "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/Moving-Averages-A-Comprehensive-Guide.pdf",
+        "last_modified": 1751115070.378768,
+        "ingested_at": 1751959486.1720257,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/sample_report.pdf": {
+        "file_path": "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/sample_report.pdf",
+        "last_modified": 1751959474.3785446,
+        "ingested_at": 1751959486.2840354,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/Technical_Analysis_for_Beginners_Candlestick_Trading,_Charting,.pdf": {
+        "file_path": "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/pdfs/Technical_Analysis_for_Beginners_Candlestick_Trading,_Charting,.pdf",
+        "last_modified": 1750351557.9798715,
+        "ingested_at": 1751959547.8552716,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/texts/new_research_paper.txt": {
+        "file_path": "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/texts/new_research_paper.txt",
+        "last_modified": 1751959548.0480206,
+        "ingested_at": 1751959548.2333086,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/texts/sample_article.txt": {
+        "file_path": "/mnt/one/ProjectData/Agent AI/knowledge_base_agent/data/texts/sample_article.txt",
+        "last_modified": 1751959474.371597,
+        "ingested_at": 1751959548.044229,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/Moving-Averages-A-Comprehensive-Guide.pdf": {
+        "file_path": "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/Moving-Averages-A-Comprehensive-Guide.pdf",
+        "last_modified": 1751115070.378768,
+        "ingested_at": 1751962197.2868207,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/sample_report.pdf": {
+        "file_path": "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/sample_report.pdf",
+        "last_modified": 1751962185.700888,
+        "ingested_at": 1751962197.4162025,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/Technical_Analysis_for_Beginners_Candlestick_Trading,_Charting,.pdf": {
+        "file_path": "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/pdfs/Technical_Analysis_for_Beginners_Candlestick_Trading,_Charting,.pdf",
+        "last_modified": 1750351557.9798715,
+        "ingested_at": 1751962279.2100887,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/texts/new_research_paper.txt": {
+        "file_path": "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/texts/new_research_paper.txt",
+        "last_modified": 1751962279.4184391,
+        "ingested_at": 1751962279.6505976,
+        "status": "success",
+        "error_message": null
+    },
+    "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/texts/sample_article.txt": {
+        "file_path": "/mnt/one/Agent Ai Global/Agent AI/knowledge_base_agent/data/texts/sample_article.txt",
+        "last_modified": 1751962185.6911438,
+        "ingested_at": 1751962279.4152422,
+        "status": "success",
+        "error_message": null
+    }
+}

@@ -1,0 +1,3 @@
+.kbavenv/
+__pycache__/
+**/data/*/
