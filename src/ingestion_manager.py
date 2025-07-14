@@ -5,10 +5,11 @@ import logging
 import time
 from typing import Dict
 
-from qdrant_manager import QdrantManager
-from document_processors import DocumentProcessor, PdfProcessor, TextProcessor # Import all processors
-from file_tracker import FileTracker
-from config import PDF_DIR, TEXT_DIR, COLLECTION_NAME # Import directories and collection name
+from src.qdrant_manager import QdrantManager
+from src.document_processors import DocumentProcessor, PdfProcessor, TextProcessor
+from src.file_tracker import FileTracker
+from src.config import PDF_DIR, TEXT_DIR, COLLECTION_NAME
+from src.config import INGESTED_TRACKER_FILE # Import INGESTED_TRACKER_FILE for clearing
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -25,10 +26,6 @@ class IngestionManager:
         self.processors: Dict[str, DocumentProcessor] = {
             "pdf": PdfProcessor(),
             "txt": TextProcessor()
-            # Add other processors here when available:
-            # "docx": DocxProcessor(),
-            # "jpg": ImageProcessor(),
-            # "png": ImageProcessor(),
         }
         logging.info("IngestionManager initialized with QdrantManager, FileTracker, and document processors.")
 
@@ -51,22 +48,10 @@ class IngestionManager:
         start_time = time.time()
         
         try:
-            # --- START FIX ---
             file_abspath = os.path.abspath(file_path)
             
             # Check if the file was previously successfully ingested and exists in Qdrant
-            # Use get_collection_info() from QdrantManager for robustness
             collection_info = self.qdrant_manager.get_collection_info()
-            
-            # Only attempt to delete if:
-            # 1. The file was tracked as successfully ingested before.
-            # 2. Qdrant collection exists and has vectors (optional, but good for efficiency).
-            # 3. This isn't the first time the collection is created (as recreate_collection is used).
-            #    Given we use recreate_collection at the start of run_ingestion_scan,
-            #    the collection is usually empty on the *first* run of the whole scan.
-            #    However, if a file is modified and *then* re-processed *within the same scan*,
-            #    or if you run `process_and_ingest_single_document` independently,
-            #    this logic becomes crucial.
             
             if (file_abspath in self.file_tracker.tracker and 
                 self.file_tracker.tracker[file_abspath].status == "success" and
@@ -74,7 +59,6 @@ class IngestionManager:
                 
                 logging.info(f"Detected modification/re-ingestion for '{file_name}'. Deleting old points from Qdrant.")
                 self.qdrant_manager.delete_points_by_file(file_name)
-            # --- END FIX ---
 
 
             # Step 1: Extract Text
@@ -117,10 +101,13 @@ class IngestionManager:
         Scans designated data directories for new or modified documents
         and triggers their ingestion into Qdrant.
         """
-        logging.info("Starting Qdrant collection setup...")
-        # For development, recreating is fine. In production, consider `create_collection_if_not_exists()`
-        # which would be part of QdrantManager.
-        self.qdrant_manager.recreate_collection() 
+        logging.info("Starting Qdrant collection setup (ensuring it exists)...")
+        try:
+            self.qdrant_manager.get_collection_info()
+            logging.info(f"Collection '{COLLECTION_NAME}' already exists.")
+        except Exception: # This means collection likely doesn't exist
+            logging.info(f"Collection '{COLLECTION_NAME}' does not exist or cannot be accessed. Creating it.")
+            self.qdrant_manager.recreate_collection() 
 
         logging.info("Starting document ingestion scan...")
 
@@ -140,3 +127,32 @@ class IngestionManager:
 
         logging.info("Document ingestion scan complete.")
         self.qdrant_manager.get_collection_info() # Display final collection stats
+
+    def clear_all_ingested_data(self):
+        """
+        Completely clears all ingested data from Qdrant and resets the ingestion tracker.
+        """
+        logging.info("--- Starting full data clear operation ---")
+        try:
+            # 1. Clear Qdrant collection by recreating it
+            logging.info(f"Recreating Qdrant collection '{COLLECTION_NAME}' to clear all data...")
+            self.qdrant_manager.recreate_collection()
+            logging.info("Qdrant collection cleared successfully.")
+            self.qdrant_manager.get_collection_info() # Confirm it's empty
+
+            # 2. Delete the ingested files tracker
+            if os.path.exists(INGESTED_TRACKER_FILE):
+                os.remove(INGESTED_TRACKER_FILE)
+                logging.info(f"Deleted ingested files tracker: {INGESTED_TRACKER_FILE}")
+            else:
+                logging.info(f"Ingested files tracker not found at {INGESTED_TRACKER_FILE}. Nothing to delete.")
+            
+            # Reset the internal tracker state
+            self.file_tracker.tracker = {} 
+            logging.info("Internal file tracker state reset.")
+
+        except Exception as e:
+            logging.error(f"Error during full data clear operation: {e}", exc_info=True)
+            raise # Re-raise the exception after logging
+
+        logging.info("--- Full data clear operation complete ---")

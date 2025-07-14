@@ -6,7 +6,7 @@ from typing import List
 from qdrant_client import QdrantClient, models
 from fastembed import TextEmbedding
 
-from config import (
+from src.config import (
     QDRANT_HOST, QDRANT_PORT, QDRANT_GRPC_PORT,
     COLLECTION_NAME, VECTOR_SIZE, DISTANCE_METRIC
 )
@@ -60,31 +60,38 @@ class QdrantManager:
             return 0
 
         texts_to_embed = [chunk.text for chunk in chunks]
-        metadatas = [chunk.metadata for chunk in chunks]
         
         embeddings_generator = self.embedding_model.embed(texts_to_embed)
         
         points_to_upsert: List[models.PointStruct] = []
         
-        # Use a deterministic ID for each point based on source_file, page_number, and chunk_index
-        # This allows for updating specific chunks if content changes without deleting the whole file
-        for i, (embedding, metadata) in enumerate(zip(embeddings_generator, metadatas)):
-            unique_chunk_identifier = f"{metadata['source_file']}_{metadata.get('page_number', '')}_{metadata['chunk_index']}"
-            # Use a stable hash of the identifier as the Qdrant point ID
-            # Qdrant IDs are integers, so convert a portion of the hash to an int
+        for i, (embedding, original_chunk) in enumerate(zip(embeddings_generator, chunks)):
+             # --- DEBUG PRINTS START ---
+            if i < 5: # Only print for the first few chunks to avoid spamming the console
+                logging.info(f"Debug: Processing chunk {i} from file {original_chunk.metadata.get('source_file')}")
+                logging.info(f"Debug: Type of embedding: {type(embedding)}")
+                if hasattr(embedding, 'shape'):
+                    logging.info(f"Debug: Shape of embedding: {embedding.shape}")
+                logging.info(f"Debug: First 5 elements of embedding: {embedding.tolist()[:5]}")
+            # --- DEBUG PRINTS END ---
+            # Use a deterministic ID for each point based on source_file, page_number, and chunk_index
+            unique_chunk_identifier = f"{original_chunk.metadata['source_file']}_{original_chunk.metadata.get('page_number', '')}_{original_chunk.metadata['chunk_index']}"
             point_id = int(hashlib.sha256(unique_chunk_identifier.encode('utf-8')).hexdigest()[:16], 16)
+            
+            # --- IMPORTANT MODIFICATION HERE ---
+            # Add the actual 'text' of the chunk to the payload so it can be retrieved later.
+            payload = original_chunk.metadata.copy() # Start with existing metadata
+            payload["text"] = original_chunk.text    # Add the full chunk text to payload
             
             points_to_upsert.append(
                 models.PointStruct(
                     id=point_id,
                     vector=embedding.tolist(),
-                    payload=metadata
+                    payload=payload
                 )
             )
 
         try:
-            # Batching is handled internally by QdrantClient.upsert if a list is provided.
-            # However, for very large lists, you might want to manually batch them if memory is an issue.
             operation_info = self.qdrant_client.upsert(
                 collection_name=COLLECTION_NAME,
                 wait=True,
@@ -102,7 +109,6 @@ class QdrantManager:
         Returns the number of points deleted.
         """
         try:
-            # Construct a filter to select points based on the 'source_file' metadata field
             delete_result = self.qdrant_client.delete(
                 collection_name=COLLECTION_NAME,
                 points_selector=models.PointSelector(
@@ -117,16 +123,11 @@ class QdrantManager:
                 ),
                 wait=True
             )
-            # The 'delete_result.status.deleted' is not directly available, but
-            # `status.ok` indicates if the operation was successful.
-            # Qdrant currently doesn't return count of deleted points directly from `delete` method
             logging.info(f"Attempted to delete points for file '{file_name}' from Qdrant. Status: {delete_result.status}")
-            # If successful, we assume deletion was performed. For exact count,
-            # you'd need to query before and after, which is less efficient.
-            return 1 # Indicate that delete operation was attempted (not necessarily points deleted)
+            return 1 # Indicate that delete operation was attempted
         except Exception as e:
             logging.error(f"Error deleting points for file '{file_name}' from Qdrant: {e}", exc_info=True)
-            raise # Re-raise to indicate failure
+            raise
 
     def get_collection_info(self):
         """Retrieves and logs information about the Qdrant collection."""
@@ -138,4 +139,5 @@ class QdrantManager:
             return collection_info
         except Exception as e:
             logging.error(f"Error getting collection info for '{COLLECTION_NAME}': {e}", exc_info=True)
+            # Depending on context, you might want to raise, but for info retrieval, return None is often fine.
             return None
