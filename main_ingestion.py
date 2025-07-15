@@ -130,8 +130,8 @@ if __name__ == "__main__":
     # --- To test new/modified document scenario: ---
     # After an initial run, uncomment this block to simulate changes and run again.
     #simulate_document_changes() # Prepare new/modified files
-    logging.info("\n--- Running ingestion scan again (should only process new/modified files) ---")
-    ingestion_manager.run_ingestion_scan()
-    logging.info("Second ingestion scan complete.")
+    #logging.info("\n--- Running ingestion scan again (should only process new/modified files) ---")
+    #ingestion_manager.run_ingestion_scan()
+    #logging.info("Second ingestion scan complete.")
 
     logging.info("\n--- All ingestion processes finished. ---")
