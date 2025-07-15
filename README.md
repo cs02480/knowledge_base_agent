@@ -5,26 +5,6 @@
 
 This project implements a Retrieval-Augmented Generation (RAG) pipeline designed to answer questions based on a local knowledge base. It uses Qdrant as a vector database for efficient document retrieval and Ollama for local LLM inference.
 
-## Project Structure
-knowledge_base_agent/
-├── data/
-│   ├── pdfs/               # Directory for PDF documents to be ingested
-│   └── texts/              # Directory for plain text documents to be ingested
-├── .kbavenv/               # Python Virtual Environment
-├── src/
-│   ├── config.py           # Configuration settings (Qdrant, Ollama, etc.)
-│   ├── document_models.py  # Data models for chunks, documents, etc.
-│   ├── document_processors.py # Handles parsing and chunking of different file types
-│   ├── embedding_models.py # Integrates FastEmbed for generating embeddings
-│   ├── file_tracker.py     # Tracks ingested files to prevent re-ingestion
-│   ├── llm_integrator.py   # Integrates with Ollama for LLM inference
-│   ├── qdrant_manager.py   # Manages interaction with Qdrant (create collection, upload, get info)
-│   └── retriever.py        # Handles embedding queries and retrieving relevant chunks from Qdrant
-├── main_ingestion.py       # Script to process and ingest documents into Qdrant
-├── main_rag.py             # Main script to run the RAG query pipeline
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
-
 
 ## Module Explanation
 
